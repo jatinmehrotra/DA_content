@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'IaC Demo - S3 Bucket and Lambda Function (CloudFormation)'
+
+Resources:
+  # S3 Bucket with security best practices
+  DemoBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  # IAM Role for Lambda execution with least privilege
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # Lambda Function with explicit resource limits
+  DemoFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: iac-demo-cfn-function
+      Runtime: python3.12
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 10
+      MemorySize: 128
+      Code:
+        ZipFile: |
+          import json
+
+          def handler(event, context):
+              return {
+                  "statusCode": 200,
+                  "body": json.dumps({
+                      "message": "Hello from CloudFormation!",
+                      "tool": "AWS CloudFormation"
+                  })
+              }
+
+Outputs:
+  BucketName:
+    Description: Name of the S3 bucket
+    Value: !Ref DemoBucket
+
+  FunctionArn:
+    Description: ARN of the Lambda function
+    Value: !GetAtt DemoFunction.Arn

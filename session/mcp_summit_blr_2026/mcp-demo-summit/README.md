@@ -252,3 +252,34 @@ The tool runtime uses IAM-based authentication. All requests are SigV4-signed �
 ### Scaling
 
 AgentCore handles concurrent requests automatically. The deployed tool runtime scales up to serve multiple simultaneous agent sessions without any manual configuration. You don't manage containers, load balancers, or autoscaling rules — AgentCore does it for you.
+
+## TODO — Remaining work for the demo
+
+### Live Demo UI (not yet implemented)
+
+The current demo uses `test_demo.py` (a Python script) to validate all features. For the live presentation, a more visual demo is needed:
+
+- [ ] **Option A: Streamlit Chat UI** — Update `app.py` to connect to the Gateway (not a Bedrock Agent). The UI would:
+  - Send MCP tool calls via SigV4 to the gateway
+  - Show tool results in chat format
+  - Display policy denial when `delete_incident` is called
+  - Show trace/latency info from the response
+
+- [ ] **Option B: MCP Inspector** — Use MCP Inspector connected to the gateway. Requires OAuth/JWT auth on the gateway (currently IAM-only, which MCP Inspector doesn't support).
+
+- [ ] **Option C: Bedrock Agent** — Create a Bedrock Agent that connects to the AgentCore Gateway as its tool source. The Streamlit UI (`app.py`) would then interact with the Bedrock Agent which routes tool calls through the gateway. This shows the full production path: User → Streamlit → Bedrock Agent → Gateway (policy) → Runtime (MCP server).
+
+### Deployment automation (optional)
+
+- [ ] Automate gateway target creation in `deploy.sh` (blocked by `CreateGatewayTarget` IAM permission — needs service team fix or different auth approach)
+- [ ] Automate Cedar policy creation in `deploy.sh` (blocked by CDK `GetGateway` permission when policy references a gateway in the same stack)
+
+### Observability
+
+- [ ] Show CloudWatch observability dashboard during the live demo
+- [ ] Add trace visualization to Streamlit UI (parse trace events from tool call responses)
+
+### Cleanup
+
+- [ ] Create `destroy.sh` script to tear down all resources cleanly
+

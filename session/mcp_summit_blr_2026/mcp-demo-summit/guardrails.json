@@ -1,0 +1,14 @@
+{
+  "name": "demo-guardrail",
+  "description": "Blocks destructive operations like delete requests",
+  "blockedInputMessaging": "I cannot perform destructive operations like deleting data.",
+  "wordPolicyConfig": {
+    "managedWordListsConfig": [],
+    "wordsConfig": [
+      {"text": "delete"},
+      {"text": "remove"},
+      {"text": "destroy"},
+      {"text": "drop"}
+    ]
+  }
+}

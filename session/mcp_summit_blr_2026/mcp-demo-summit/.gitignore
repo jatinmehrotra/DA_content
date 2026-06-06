@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.hypothesis/
+.pytest_cache/
+
+# AgentCore project (created by deploy.sh, contains deployment-specific config)
+../mcpdemosummit/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# CDK
+cdk.out/
+node_modules/

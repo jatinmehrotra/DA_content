@@ -1,0 +1,8 @@
+# AgentCore deployment project (created by deploy.sh at runtime)
+mcpdemosummit/
+
+# OS
+.DS_Store
+
+# Presentation file (large binary)
+*.pptx

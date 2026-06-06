@@ -1,0 +1,17 @@
+[project]
+name = "mcp-demo-summit"
+version = "0.1.0"
+description = "MCP Demo Server for MCP Dev Summit Bengaluru 2026"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp",
+    "opentelemetry-api",
+    "opentelemetry-sdk",
+    "opentelemetry-exporter-otlp-proto-http",
+    "opentelemetry-distro",
+    "opentelemetry-instrumentation",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

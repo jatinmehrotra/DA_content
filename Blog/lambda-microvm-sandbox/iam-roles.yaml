@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  IAM roles for Lambda MicroVM Sandbox demo.
+  ⚠️  The Execution Role uses AdministratorAccess for demo/testing ONLY.
+  For production, replace with least-privilege permissions (CloudWatch Logs only).
+
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: S3 bucket where sandbox-code.zip will be uploaded
+    Default: your-bucket-name
+
+Resources:
+
+  # ─── Build Role ───
+  # Used during create-microvm-image to fetch code from S3 and write build logs
+  MicroVMBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: MicroVMBuildRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      Policies:
+        - PolicyName: MicroVMBuildPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ReadCodeArtifact
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub 'arn:aws:s3:::${S3BucketName}/*'
+              - Sid: WriteBuildLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+  # ─── Execution Role ───
+  # Used at MicroVM runtime. ⚠️ AdministratorAccess for DEMO ONLY.
+  # In production: restrict to CloudWatch Logs only (or whatever your app needs)
+  MicroVMExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: SandboxExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      ManagedPolicyArns:
+        # ⚠️  DEMO ONLY — Replace with least-privilege for production
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+Outputs:
+  BuildRoleArn:
+    Description: ARN for the Build Role (use in deploy.sh --build-role-arn)
+    Value: !GetAtt MicroVMBuildRole.Arn
+    Export:
+      Name: MicroVMBuildRoleArn
+
+  ExecutionRoleArn:
+    Description: ARN for the Execution Role (use in test.sh/agent.py --execution-role-arn)
+    Value: !GetAtt MicroVMExecutionRole.Arn
+    Export:
+      Name: MicroVMExecutionRoleArn

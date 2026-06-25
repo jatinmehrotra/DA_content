@@ -1,0 +1,14 @@
+# Executor dependencies
+flask==3.1.*
+gunicorn==23.*
+
+# Packages available to AI-generated code inside the sandbox
+pandas==2.*
+numpy==2.*
+matplotlib==3.*
+seaborn==0.13.*
+requests==2.*
+scikit-learn==1.*
+scipy==1.*
+beautifulsoup4==4.*
+lxml==5.*

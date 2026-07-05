@@ -1,0 +1,34 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+~$*
+
+# Kiro
+.kiro/
+
+# ---------- CDK (demo/cdk) ----------
+demo/cdk/node_modules/
+demo/cdk/dist/
+demo/cdk/cdk.out/
+demo/cdk/*.js
+demo/cdk/*.d.ts
+demo/cdk/**/*.js
+demo/cdk/**/*.d.ts
+
+# ---------- Terraform (demo/terraform) ----------
+demo/terraform/.terraform/
+demo/terraform/.terraform.lock.hcl
+demo/terraform/terraform.tfstate
+demo/terraform/terraform.tfstate.backup
+demo/terraform/*.tfplan
+demo/terraform/lambda.zip
+
+# ---------- PowerPoint temp files ----------
+presentation/~$*.pptx

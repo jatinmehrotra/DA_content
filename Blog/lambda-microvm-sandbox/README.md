@@ -32,6 +32,7 @@ lambda-microvm-sandbox/
 │   └── requirements.txt    # Packages available to generated code
 ├── agent/                  # Your application (runs OUTSIDE)
 │   ├── agent.py            # Strands agent with 3 tools
+│   ├── agent_suspend_demo.py # Suspend/resume demo (1-min idle timeout)
 │   └── requirements.txt    # Agent dependencies
 ├── sample-data/            # Test data for the demo
 │   └── sales.csv
@@ -153,6 +154,29 @@ You: What's the memory usage of a Python list with 1 million integers vs a numpy
 You: Read /data/sales.csv and tell me the top 3 products by revenue
 
 You: Install the tabulate package and print the sales data as a formatted table
+```
+
+### 5. Demo Suspend/Resume (State Preservation)
+
+To see MicroVM state survive a suspend/resume cycle (the real "state preservation" feature):
+
+```bash
+python agent_suspend_demo.py
+```
+
+This agent uses a **1-minute idle timeout** so you can see suspend/resume without waiting 5 minutes:
+
+```
+You: Write a file /workspace/state.txt with the current timestamp
+     → (agent creates sandbox, writes file)
+
+     ... wait ~70 seconds ...
+
+You: Check the sandbox state
+     → (shows SUSPENDED)
+
+You: Read /workspace/state.txt and print its contents
+     → (MicroVM auto-resumes, file is still there!)
 ```
 
 ## How It Works

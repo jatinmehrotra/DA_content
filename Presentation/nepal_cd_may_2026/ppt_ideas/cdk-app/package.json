@@ -1,0 +1,21 @@
+{
+  "name": "cdk-app",
+  "version": "1.0.0",
+  "bin": {
+    "cdk-app": "bin/cdk-app.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.178.0",
+    "typescript": "~5.7.0",
+    "ts-node": "^10.9.2",
+    "@types/node": "^22.0.0"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.178.0",
+    "constructs": "^10.0.0"
+  }
+}

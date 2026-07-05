@@ -39,6 +39,7 @@ jobs:
           echo "s3_bucket=${{ secrets.S3_BUCKET }}" >> $GITHUB_OUTPUT
           echo "build_role_arn=${{ secrets.MICROVM_BUILD_ROLE_ARN }}" >> $GITHUB_OUTPUT
           echo "execution_role_arn=${{ secrets.MICROVM_EXECUTION_ROLE_ARN }}" >> $GITHUB_OUTPUT
+          echo "proxy_url=${{ secrets.PROXY_URL }}" >> $GITHUB_OUTPUT
 
       - name: Package MicroVM image code
         run: |
@@ -178,10 +179,12 @@ jobs:
             const endpoint = '${{ steps.microvm.outputs.endpoint }}';
             const microvmId = '${{ steps.microvm.outputs.microvm_id }}';
             const branch = '${{ github.head_ref }}';
+            const proxyUrl = '${{ steps.tf.outputs.proxy_url }}';
+            const previewUrl = proxyUrl ? `${proxyUrl.replace(/\/$/, '')}/${microvmId}/` : endpoint;
             
             const body = `## 🚀 PR Environment Ready!
 
-            **Preview URL:** ${endpoint}
+            **Preview URL:** ${previewUrl}
 
             | Detail | Value |
             |--------|-------|

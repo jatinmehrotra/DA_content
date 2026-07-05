@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS DevOpsAgent Lambda Error Test Stack'
+Resources:
+  # IAM Role for Lambda function
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AWS-DevOpsAgentLambdaTestRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Name
+          Value: AWS-DevOpsAgent-Lambda-Test-Role
+        - Key: Purpose
+          Value: AWS-DevOpsAgent-Testing
+  # Lambda function that generates errors
+  TestLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: AWS-DevOpsAgent-test-lambda
+      Runtime: python3.12
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import random
+          import time
+          from datetime import datetime
+          def lambda_handler(event, context):
+              print(f"AWS DevOpsAgent Test Lambda - {datetime.now()}")
+              print(f"Event: {json.dumps(event)}")
+              
+              # Intentionally generate errors for testing
+              error_scenarios = [
+                  "Simulated database connection timeout",
+                  "Test API rate limit exceeded", 
+                  "Intentional validation error for AWS DevOpsAgent testing"
+              ]
+              
+              # Always throw an error for testing purposes
+              error_message = random.choice(error_scenarios)
+              print(f"Generating test error: {error_message}")
+              
+              # This will create a Lambda error that CloudWatch will detect
+              raise Exception(f"AWS DevOpsAgent Test Error: {error_message}")
+      Description: AWS DevOpsAgent beta test function - intentionally generates errors
+      Timeout: 30
+      Tags:
+        - Key: Name
+          Value: AWS-DevOpsAgent-Test-Lambda
+        - Key: Purpose
+          Value: AWS-DevOpsAgent-Testing
+  # CloudWatch Alarm for Lambda errors
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: AWS-DevOpsAgent-Lambda-Error-Test
+      AlarmDescription: AWS-DevOpsAgent beta test - Lambda error rate alarm
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref TestLambdaFunction
+      TreatMissingData: notBreaching
+Outputs:
+  LambdaFunctionName:
+    Description: Lambda Function Name for testing
+    Value: !Ref TestLambdaFunction
+    
+  LambdaFunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt TestLambdaFunction.Arn
+    
+  AlarmName:
+    Description: CloudWatch Alarm Name
+    Value: !Ref LambdaErrorAlarm
+    
+  TestCommand:
+    Description: AWS CLI command to test the function
+    Value: !Sub 'aws lambda invoke --function-name ${TestLambdaFunction} --payload "{\"test\":\"AWS DevOpsAgent validation\"}" response.json'

@@ -139,6 +139,14 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = "*"
       },
       {
+        Sid    = "PassNetworkConnector"
+        Effect = "Allow"
+        Action = [
+          "lambda:PassNetworkConnector"
+        ]
+        Resource = "arn:aws:lambda:*:aws:network-connector:*"
+      },
+      {
         Sid    = "PassRoles"
         Effect = "Allow"
         Action = "iam:PassRole"

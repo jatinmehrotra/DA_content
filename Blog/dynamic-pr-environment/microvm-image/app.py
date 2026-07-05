@@ -228,7 +228,7 @@ HTML_TEMPLATE = """
             const input = document.getElementById('taskInput');
             const title = input.value.trim();
             if (!title) return;
-            await fetch('/tasks', {
+            await fetch('tasks', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({title: title})
@@ -237,7 +237,7 @@ HTML_TEMPLATE = """
             location.reload();
         }
         async function deleteTask(taskId) {
-            await fetch('/tasks/' + taskId, {method: 'DELETE'});
+            await fetch('tasks/' + taskId, {method: 'DELETE'});
             location.reload();
         }
     </script>

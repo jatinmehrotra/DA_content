@@ -94,11 +94,11 @@ jobs:
               --region ${{ env.AWS_REGION }} \
               --query 'state' --output text 2>/dev/null || echo "UNKNOWN")
             echo "  Attempt $i: state=$STATE"
-            if [ "$STATE" = "CREATED" ] || [ "$STATE" = "AVAILABLE" ]; then
+            if [ "$STATE" = "CREATED" ] || [ "$STATE" = "AVAILABLE" ] || [ "$STATE" = "UPDATED" ]; then
               echo "✅ Image ready"
               break
             fi
-            if [ "$STATE" = "CREATE_FAILED" ] || [ "$STATE" = "FAILED" ]; then
+            if [ "$STATE" = "CREATE_FAILED" ] || [ "$STATE" = "FAILED" ] || [ "$STATE" = "UPDATE_FAILED" ]; then
               echo "❌ Image build failed"
               exit 1
             fi

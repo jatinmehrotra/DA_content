@@ -198,7 +198,7 @@ HTML_TEMPLATE = """
     </div>
     <div class="container">
         <h1>Task Manager</h1>
-        <p class="subtitle">Live preview of PR #{{ pr_number }}. Code changes are reflected here.</p>
+        <p class="subtitle">Live preview of PR #{{ pr_number }}. Code changes are reflected here. ✨ Now with task count!</p>
         <div class="add-form">
             <input type="text" id="taskInput" placeholder="Add a new task..." onkeypress="if(event.key==='Enter')addTask()">
             <button onclick="addTask()">Add</button>
@@ -217,6 +217,7 @@ HTML_TEMPLATE = """
             <li class="empty">No tasks yet. Add one above!</li>
             {% endif %}
         </ul>
+        <p style="text-align:center;color:#666;margin-top:20px;font-size:14px;">📋 Total tasks: {{ tasks|length }}</p>
         <div class="footer">
             <code>Lambda MicroVM</code> | Table: <code>{{ table_name }}</code> |
             Partition: <code>PR#{{ pr_number }}</code> | MicroVM: <code>{{ microvm_id }}</code>

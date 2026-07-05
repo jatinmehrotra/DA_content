@@ -67,7 +67,7 @@ jobs:
           S3_URI="s3://${{ steps.tf.outputs.s3_bucket }}/pr-${{ github.event.number }}/app-code.zip"
           BASE_IMAGE="arn:aws:lambda:${{ env.AWS_REGION }}:aws:microvm-image:al2023-1"
           BUILD_ROLE="${{ steps.tf.outputs.build_role_arn }}"
-          HOOKS='{"port":9000,"microvmHooks":{"run":"ENABLED","resume":"ENABLED","suspend":"ENABLED","terminate":"ENABLED"}}'
+          HOOKS='{"port":9000,"microvmImageHooks":{"ready":"ENABLED"},"microvmHooks":{"run":"ENABLED","resume":"ENABLED","suspend":"ENABLED","terminate":"ENABLED"}}'
 
           # Check if image exists
           if aws lambda-microvms get-microvm-image --image-identifier $IMAGE_ARN --region ${{ env.AWS_REGION }} 2>/dev/null; then

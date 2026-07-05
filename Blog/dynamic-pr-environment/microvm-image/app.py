@@ -56,6 +56,16 @@ def load_config():
 hooks_app = Flask("hooks")
 
 
+@hooks_app.route("/aws/lambda-microvms/runtime/v1/ready", methods=["POST"])
+def hook_ready():
+    """
+    /ready hook — Called during image build to signal app has initialized.
+    Return 200 when ready for snapshot, 503 if still starting up.
+    """
+    logger.info("=== /ready hook === App initialized, ready for snapshot")
+    return jsonify({"status": "ready"}), 200
+
+
 @hooks_app.route("/aws/lambda-microvms/runtime/v1/run", methods=["POST"])
 def hook_run():
     """

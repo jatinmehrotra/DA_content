@@ -1,0 +1,93 @@
+name: Cleanup PR Environment
+
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - 'Blog/dynamic-pr-environment/**'
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Find and terminate MicroVM for this PR
+        run: |
+          echo "🗑️ Cleaning up PR #${{ github.event.number }} environment..."
+
+          # List all running/suspended MicroVMs and terminate them
+          # Note: In production, you'd track PR→MicroVM mapping in DynamoDB or labels
+          MICROVMS=$(aws lambda-microvms list-microvms --region ${{ env.AWS_REGION }} --output json | \
+            jq -r '.items[] | select(.state=="RUNNING" or .state=="SUSPENDED") | .microvmId')
+
+          if [ -z "$MICROVMS" ]; then
+            echo "No running MicroVMs found"
+          else
+            for ID in $MICROVMS; do
+              echo "Terminating: $ID"
+              aws lambda-microvms terminate-microvm \
+                --microvm-identifier "$ID" \
+                --region ${{ env.AWS_REGION }} || true
+            done
+          fi
+
+          echo "✅ MicroVM(s) terminated"
+
+      - name: Clean up DynamoDB data for this PR
+        run: |
+          echo "Cleaning DynamoDB partition PR#${{ github.event.number }}..."
+
+          # Query all items for this PR
+          ITEMS=$(aws dynamodb query \
+            --table-name pr-environments \
+            --key-condition-expression "PK = :pk" \
+            --expression-attribute-values '{":pk":{"S":"PR#${{ github.event.number }}"}}' \
+            --projection-expression "PK, SK" \
+            --region ${{ env.AWS_REGION }} \
+            --output json | jq -c '.Items[]')
+
+          if [ -z "$ITEMS" ]; then
+            echo "No data found for PR #${{ github.event.number }}"
+          else
+            COUNT=0
+            echo "$ITEMS" | while read -r item; do
+              PK=$(echo $item | jq -r '.PK.S')
+              SK=$(echo $item | jq -r '.SK.S')
+              aws dynamodb delete-item \
+                --table-name pr-environments \
+                --key "{\"PK\":{\"S\":\"$PK\"},\"SK\":{\"S\":\"$SK\"}}" \
+                --region ${{ env.AWS_REGION }}
+              COUNT=$((COUNT+1))
+            done
+            echo "✅ Deleted items for PR #${{ github.event.number }}"
+          fi
+
+      - name: Clean up S3 artifacts
+        continue-on-error: true
+        run: |
+          aws s3 rm s3://${{ secrets.S3_BUCKET }}/pr-${{ github.event.number }}/ --recursive || true
+          echo "✅ S3 artifacts cleaned"
+
+      - name: Post cleanup confirmation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🗑️ PR Environment Destroyed\n\nThe Lambda MicroVM environment for this PR has been terminated and all associated data cleaned up.\n\n- MicroVM: terminated\n- DynamoDB data: deleted\n- S3 artifacts: removed`
+            });

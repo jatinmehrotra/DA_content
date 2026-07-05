@@ -1,0 +1,5 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+region      = "us-east-1"
+github_org  = "jatinmehrotra"
+github_repo = "DA_content"

@@ -34,7 +34,7 @@ config = {
     "pr_number": "local",
     "branch": "main",
     "author": "developer",
-    "accent_color": "#FF9900",
+    "accent_color": "#E91E63",
     "dynamodb_table": "pr-environments",
     "microvm_id": "local",
 }
@@ -87,7 +87,7 @@ def hook_run():
         "pr_number": payload.get("pr_number", "local"),
         "branch": payload.get("branch", "main"),
         "author": payload.get("author", "developer"),
-        "accent_color": payload.get("accent_color", "#FF9900"),
+        "accent_color": payload.get("accent_color", "#E91E63"),
         "dynamodb_table": payload.get("dynamodb_table", "pr-environments"),
         "microvm_id": microvm_id,
         "cleanup_data": payload.get("cleanup_data", False),

@@ -43,7 +43,10 @@ jobs:
       - name: Package MicroVM image code
         run: |
           cd microvm-image
-          zip -r ../app-code.zip Dockerfile app.py requirements.txt
+          # Pre-download wheels for arm64 (Graviton) — avoids PyPI download during image build
+          pip download -r requirements.txt -d wheels/ \
+            --platform manylinux2014_aarch64 --python-version 39 --only-binary=:all:
+          zip -r ../app-code.zip Dockerfile app.py requirements.txt wheels/
           cd ..
 
       - name: Upload artifact to S3
@@ -64,6 +67,7 @@ jobs:
           S3_URI="s3://${{ steps.tf.outputs.s3_bucket }}/pr-${{ github.event.number }}/app-code.zip"
           BASE_IMAGE="arn:aws:lambda:${{ env.AWS_REGION }}:aws:microvm-image:al2023-1"
           BUILD_ROLE="${{ steps.tf.outputs.build_role_arn }}"
+          HOOKS='{"port":9000,"microvmHooks":{"run":{"enabled":true},"resume":{"enabled":true},"suspend":{"enabled":true},"terminate":{"enabled":true}}}'
 
           # Check if image exists
           if aws lambda-microvms get-microvm-image --image-identifier $IMAGE_ARN --region ${{ env.AWS_REGION }} 2>/dev/null; then
@@ -73,6 +77,7 @@ jobs:
               --code-artifact uri=$S3_URI \
               --base-image-arn $BASE_IMAGE \
               --build-role-arn $BUILD_ROLE \
+              --hooks "$HOOKS" \
               --region ${{ env.AWS_REGION }}
           else
             echo "Creating new image..."
@@ -81,6 +86,7 @@ jobs:
               --code-artifact uri=$S3_URI \
               --base-image-arn $BASE_IMAGE \
               --build-role-arn $BUILD_ROLE \
+              --hooks "$HOOKS" \
               --region ${{ env.AWS_REGION }}
           fi
 
@@ -94,11 +100,11 @@ jobs:
               --region ${{ env.AWS_REGION }} \
               --query 'state' --output text 2>/dev/null || echo "UNKNOWN")
             echo "  Attempt $i: state=$STATE"
-            if [ "$STATE" = "CREATED" ] || [ "$STATE" = "AVAILABLE" ]; then
+            if [ "$STATE" = "CREATED" ] || [ "$STATE" = "AVAILABLE" ] || [ "$STATE" = "UPDATED" ]; then
               echo "✅ Image ready"
               break
             fi
-            if [ "$STATE" = "CREATE_FAILED" ] || [ "$STATE" = "FAILED" ]; then
+            if [ "$STATE" = "CREATE_FAILED" ] || [ "$STATE" = "FAILED" ] || [ "$STATE" = "UPDATE_FAILED" ]; then
               echo "❌ Image build failed"
               exit 1
             fi

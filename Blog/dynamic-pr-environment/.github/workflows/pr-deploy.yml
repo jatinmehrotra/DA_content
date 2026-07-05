@@ -43,10 +43,7 @@ jobs:
       - name: Package MicroVM image code
         run: |
           cd microvm-image
-          # Pre-download wheels for arm64 (Graviton) — avoids PyPI download during image build
-          pip download -r requirements.txt -d wheels/ \
-            --platform manylinux2014_aarch64 --python-version 39 --only-binary=:all:
-          zip -r ../app-code.zip Dockerfile app.py requirements.txt wheels/
+          zip -r ../app-code.zip Dockerfile app.py requirements.txt
           cd ..
 
       - name: Upload artifact to S3

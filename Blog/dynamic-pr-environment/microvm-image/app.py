@@ -150,52 +150,48 @@ HTML_TEMPLATE = """
     <title>PR #{{ pr_number }} — Task Manager</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: #f0fdf4; color: #1a2e1a; }
+        body { font-family: 'JetBrains Mono', 'Fira Code', monospace; background: #0d1117; color: #e6edf3; }
         .pr-banner {
-            background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
-            color: white; padding: 18px 28px; font-size: 15px;
+            background: linear-gradient(135deg, #6e40c9 0%, #f78166 100%);
+            color: white; padding: 16px 24px; font-size: 14px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 4px solid #15803d;
+            border-bottom: 4px solid #6e40c9;
         }
-        .pr-banner strong { font-size: 18px; font-weight: 700; }
-        .pr-banner .meta { opacity: 0.9; font-size: 13px; }
-        .container { max-width: 720px; margin: 50px auto; padding: 0 24px; }
-        h1 { color: #14532d; margin-bottom: 12px; font-size: 36px; font-weight: 800; }
-        .subtitle { color: #4d7c4d; margin-bottom: 35px; font-size: 16px; line-height: 1.5; }
-        .add-form { display: flex; gap: 12px; margin-bottom: 35px; }
+        .pr-banner strong { font-size: 16px; letter-spacing: 0.5px; }
+        .pr-banner .meta { opacity: 0.9; }
+        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; color: #e6edf3; }
+        h1 { color: #f0f6fc; margin-bottom: 8px; font-size: 32px; }
+        .subtitle { color: #8b949e; margin-bottom: 30px; font-size: 14px; }
+        .add-form { display: flex; gap: 10px; margin-bottom: 30px; }
         .add-form input {
-            flex: 1; padding: 14px 18px; border: 2px solid #86efac;
-            border-radius: 12px; font-size: 15px; background: white;
+            flex: 1; padding: 12px 16px; border: 1px solid #30363d;
+            border-radius: 8px; font-size: 14px; background: #161b22; color: #e6edf3;
         }
-        .add-form input:focus { outline: none; border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.1); }
+        .add-form input::placeholder { color: #484f58; }
         .add-form button {
-            padding: 14px 28px; background: #16a34a;
-            color: white; border: none; border-radius: 12px;
-            cursor: pointer; font-size: 15px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1px;
+            padding: 12px 24px; background: linear-gradient(135deg, #6e40c9, #a371f7);
+            color: white; border: none; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 600; letter-spacing: 0.3px;
         }
-        .add-form button:hover { background: #15803d; transform: scale(1.02); }
+        .add-form button:hover { opacity: 0.85; transform: translateY(-1px); }
         .task-list { list-style: none; }
         .task-item {
-            background: white; padding: 18px 22px; margin-bottom: 12px;
-            border-radius: 14px; border: 2px solid #bbf7d0;
+            background: #161b22; padding: 16px 20px; margin-bottom: 10px;
+            border-radius: 10px; border: 1px solid #30363d;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .task-item:hover { border-color: #16a34a; box-shadow: 0 4px 12px rgba(22,163,74,0.1); }
-        .task-item .task-text { font-size: 16px; color: #1a2e1a; font-weight: 500; }
-        .task-item .task-time { font-size: 12px; color: #6b8f6b; margin-top: 4px; }
+        .task-item:hover { border-color: #6e40c9; }
+        .task-item .task-text { font-size: 15px; color: #f0f6fc; }
+        .task-item .task-time { font-size: 11px; color: #484f58; }
         .task-item .delete-btn {
-            background: #fef2f2; border: none; color: #dc2626;
-            cursor: pointer; font-size: 20px; width: 32px; height: 32px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: none; border: none; color: #f85149;
+            cursor: pointer; font-size: 20px;
         }
-        .task-item .delete-btn:hover { background: #dc2626; color: white; }
-        .empty { text-align: center; color: #6b8f6b; padding: 50px; font-size: 16px; }
+        .empty { text-align: center; color: #484f58; padding: 40px; font-style: italic; }
         .footer {
-            text-align: center; margin-top: 50px; font-size: 12px; color: #6b8f6b; padding: 20px;
+            text-align: center; margin-top: 40px; font-size: 12px; color: #484f58; padding: 20px;
         }
-        .footer code { background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .footer code { background: #30363d; color: #a371f7; padding: 2px 6px; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -204,8 +200,8 @@ HTML_TEMPLATE = """
         <div class="meta">by {{ author }} | Lambda MicroVM PR Environment</div>
     </div>
     <div class="container">
-        <h1>Task Garden 🌱</h1>
-        <p class="subtitle">Grow your tasks, harvest your productivity. PR #{{ pr_number }} running on Lambda MicroVM.</p>
+        <h1>// Task Manager v2.0</h1>
+        <p class="subtitle">[ PR #{{ pr_number }} ] Dark mode redesign. Running on Lambda MicroVM.</p>
         <div class="add-form">
             <input type="text" id="taskInput" placeholder="Add a new task..." onkeypress="if(event.key==='Enter')addTask()">
             <button onclick="addTask()">Add</button>

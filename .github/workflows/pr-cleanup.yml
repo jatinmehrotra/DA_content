@@ -13,6 +13,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
+  IMAGE_NAME: pr-env-app-pr${{ github.event.number }}
 
 jobs:
   cleanup:
@@ -28,23 +29,34 @@ jobs:
         run: |
           echo "🗑️ Cleaning up PR #${{ github.event.number }} environment..."
 
-          # List all running/suspended MicroVMs and terminate them
-          # Note: In production, you'd track PR→MicroVM mapping in DynamoDB or labels
-          MICROVMS=$(aws lambda-microvms list-microvms --region ${{ env.AWS_REGION }} --output json | \
-            jq -r '.items[] | select(.state=="RUNNING" or .state=="SUSPENDED") | .microvmId')
+          # Look up the MicroVM for this PR from DynamoDB mapping
+          MICROVM_ID=$(aws dynamodb get-item \
+            --table-name pr-environments \
+            --key "{\"PK\":{\"S\":\"MICROVM#PR${{ github.event.number }}\"},\"SK\":{\"S\":\"MAPPING\"}}" \
+            --region ${{ env.AWS_REGION }} \
+            --query 'Item.microvm_id.S' --output text 2>/dev/null || echo "None")
 
-          if [ -z "$MICROVMS" ]; then
-            echo "No running MicroVMs found"
+          if [ "$MICROVM_ID" != "None" ] && [ "$MICROVM_ID" != "" ]; then
+            echo "Terminating MicroVM: $MICROVM_ID"
+            aws lambda-microvms terminate-microvm \
+              --microvm-identifier "$MICROVM_ID" \
+              --region ${{ env.AWS_REGION }} || true
           else
-            for ID in $MICROVMS; do
-              echo "Terminating: $ID"
-              aws lambda-microvms terminate-microvm \
-                --microvm-identifier "$ID" \
-                --region ${{ env.AWS_REGION }} || true
-            done
+            echo "No MicroVM mapping found for PR #${{ github.event.number }}"
           fi
 
           echo "✅ MicroVM(s) terminated"
+
+      - name: Delete MicroVM image for this PR
+        continue-on-error: true
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          IMAGE_ARN="arn:aws:lambda:${{ env.AWS_REGION }}:${ACCOUNT_ID}:microvm-image:${{ env.IMAGE_NAME }}"
+          echo "Deleting image: $IMAGE_ARN"
+          aws lambda-microvms delete-microvm-image \
+            --image-identifier "$IMAGE_ARN" \
+            --region ${{ env.AWS_REGION }} || true
+          echo "✅ Image deleted"
 
       - name: Clean up DynamoDB data for this PR
         run: |

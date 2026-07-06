@@ -13,7 +13,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  IMAGE_NAME: pr-env-app
+  IMAGE_NAME: pr-env-app-pr${{ github.event.number }}
   DYNAMODB_TABLE: pr-environments
 
 jobs:
@@ -112,17 +112,20 @@ jobs:
       - name: Terminate existing MicroVM (if any)
         continue-on-error: true
         run: |
-          # Find any running MicroVM for this PR (stored in PR comment or by tag)
-          EXISTING=$(aws lambda-microvms list-microvms --region ${{ env.AWS_REGION }} --output json | \
-            jq -r '.items[] | select(.state=="RUNNING" or .state=="SUSPENDED") | .microvmId' | head -5)
-          
-          # Note: In production, you'd track PR→MicroVM mapping (e.g., in DynamoDB or PR labels)
-          # For demo, we terminate all running MicroVMs from this image
-          for ID in $EXISTING; do
-            echo "Terminating old MicroVM: $ID"
-            aws lambda-microvms terminate-microvm --microvm-identifier "$ID" --region ${{ env.AWS_REGION }} || true
-          done
-          sleep 5
+          # Look up the MicroVM ID for THIS PR from DynamoDB
+          EXISTING=$(aws dynamodb get-item \
+            --table-name ${{ env.DYNAMODB_TABLE }} \
+            --key "{\"PK\":{\"S\":\"MICROVM#PR${{ github.event.number }}\"},\"SK\":{\"S\":\"MAPPING\"}}" \
+            --region ${{ env.AWS_REGION }} \
+            --query 'Item.microvm_id.S' --output text 2>/dev/null || echo "None")
+
+          if [ "$EXISTING" != "None" ] && [ "$EXISTING" != "" ]; then
+            echo "Terminating MicroVM for PR #${{ github.event.number }}: $EXISTING"
+            aws lambda-microvms terminate-microvm --microvm-identifier "$EXISTING" --region ${{ env.AWS_REGION }} || true
+            sleep 5
+          else
+            echo "No existing MicroVM found for PR #${{ github.event.number }}"
+          fi
 
       - name: Run new MicroVM
         id: microvm
@@ -154,6 +157,16 @@ jobs:
           echo "endpoint=https://$ENDPOINT" >> $GITHUB_OUTPUT
           echo "🚀 MicroVM: $MICROVM_ID"
           echo "🌐 Endpoint: https://$ENDPOINT"
+
+      - name: Store PR-to-MicroVM mapping
+        run: |
+          MICROVM_ID="${{ steps.microvm.outputs.microvm_id }}"
+          # Store mapping so we can find this PR's MicroVM later (for terminate on next push or PR close)
+          aws dynamodb put-item \
+            --table-name ${{ env.DYNAMODB_TABLE }} \
+            --item "{\"PK\":{\"S\":\"MICROVM#PR${{ github.event.number }}\"},\"SK\":{\"S\":\"MAPPING\"},\"microvm_id\":{\"S\":\"${MICROVM_ID}\"},\"branch\":{\"S\":\"${{ github.head_ref }}\"}}" \
+            --region ${{ env.AWS_REGION }}
+          echo "📝 Stored PR #${{ github.event.number }} → ${MICROVM_ID} mapping"
 
       - name: Generate and store access token
         id: token

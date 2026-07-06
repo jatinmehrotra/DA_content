@@ -145,7 +145,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "lambda:ListMicrovms",
           "lambda:TerminateMicrovm",
           "lambda:CreateMicrovmAuthToken",
-          "lambda:PassNetworkConnector"
+          "lambda:PassNetworkConnector",
+          "lambda:DeleteMicrovmImage"
         ]
         Resource = "*"
       },

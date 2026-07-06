@@ -155,6 +155,7 @@ HTML_TEMPLATE = """
             background: linear-gradient(135deg, #6e40c9 0%, #f78166 100%);
             color: white; padding: 16px 24px; font-size: 14px;
             display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 4px solid #6e40c9;
         }
         .pr-banner strong { font-size: 16px; letter-spacing: 0.5px; }
         .pr-banner .meta { opacity: 0.9; }
@@ -229,7 +230,7 @@ HTML_TEMPLATE = """
             const input = document.getElementById('taskInput');
             const title = input.value.trim();
             if (!title) return;
-            await fetch('/tasks', {
+            await fetch('tasks', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({title: title})
@@ -238,7 +239,7 @@ HTML_TEMPLATE = """
             location.reload();
         }
         async function deleteTask(taskId) {
-            await fetch('/tasks/' + taskId, {method: 'DELETE'});
+            await fetch('tasks/' + taskId, {method: 'DELETE'});
             location.reload();
         }
     </script>
@@ -401,4 +402,3 @@ if __name__ == "__main__":
     # Then start app server (user traffic)
     logger.info(f"Starting app server on port {APP_PORT}")
     app.run(host="0.0.0.0", port=APP_PORT, debug=False)
-

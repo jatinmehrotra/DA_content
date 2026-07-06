@@ -150,45 +150,47 @@ HTML_TEMPLATE = """
     <title>PR #{{ pr_number }} — Task Manager</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; }
+        body { font-family: 'JetBrains Mono', 'Fira Code', monospace; background: #0d1117; color: #e6edf3; }
         .pr-banner {
-            background: {{ accent_color }};
-            color: white; padding: 12px 20px; font-size: 13px;
+            background: linear-gradient(135deg, #6e40c9 0%, #f78166 100%);
+            color: white; padding: 16px 24px; font-size: 14px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .pr-banner strong { font-size: 14px; }
+        .pr-banner strong { font-size: 16px; letter-spacing: 0.5px; }
         .pr-banner .meta { opacity: 0.9; }
-        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; }
-        h1 { color: #232F3E; margin-bottom: 8px; }
-        .subtitle { color: #666; margin-bottom: 30px; font-size: 14px; }
+        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; color: #e6edf3; }
+        h1 { color: #f0f6fc; margin-bottom: 8px; font-size: 32px; }
+        .subtitle { color: #8b949e; margin-bottom: 30px; font-size: 14px; }
         .add-form { display: flex; gap: 10px; margin-bottom: 30px; }
         .add-form input {
-            flex: 1; padding: 10px 14px; border: 1px solid #ddd;
-            border-radius: 6px; font-size: 14px;
+            flex: 1; padding: 12px 16px; border: 1px solid #30363d;
+            border-radius: 8px; font-size: 14px; background: #161b22; color: #e6edf3;
         }
+        .add-form input::placeholder { color: #484f58; }
         .add-form button {
-            padding: 10px 20px; background: {{ accent_color }};
-            color: white; border: none; border-radius: 6px;
-            cursor: pointer; font-size: 14px; font-weight: 500;
+            padding: 12px 24px; background: linear-gradient(135deg, #6e40c9, #a371f7);
+            color: white; border: none; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 600; letter-spacing: 0.3px;
         }
-        .add-form button:hover { opacity: 0.9; }
+        .add-form button:hover { opacity: 0.85; transform: translateY(-1px); }
         .task-list { list-style: none; }
         .task-item {
-            background: white; padding: 14px 18px; margin-bottom: 8px;
-            border-radius: 8px; border: 1px solid #eee;
+            background: #161b22; padding: 16px 20px; margin-bottom: 10px;
+            border-radius: 10px; border: 1px solid #30363d;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .task-item .task-text { font-size: 14px; color: #333; }
-        .task-item .task-time { font-size: 11px; color: #999; }
+        .task-item:hover { border-color: #6e40c9; }
+        .task-item .task-text { font-size: 15px; color: #f0f6fc; }
+        .task-item .task-time { font-size: 11px; color: #484f58; }
         .task-item .delete-btn {
-            background: none; border: none; color: #D13212;
-            cursor: pointer; font-size: 18px;
+            background: none; border: none; color: #f85149;
+            cursor: pointer; font-size: 20px;
         }
-        .empty { text-align: center; color: #999; padding: 40px; }
+        .empty { text-align: center; color: #484f58; padding: 40px; font-style: italic; }
         .footer {
-            text-align: center; margin-top: 40px; font-size: 12px; color: #999; padding: 20px;
+            text-align: center; margin-top: 40px; font-size: 12px; color: #484f58; padding: 20px;
         }
-        .footer code { background: #eee; padding: 2px 6px; border-radius: 3px; }
+        .footer code { background: #30363d; color: #a371f7; padding: 2px 6px; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -197,8 +199,8 @@ HTML_TEMPLATE = """
         <div class="meta">by {{ author }} | Lambda MicroVM PR Environment</div>
     </div>
     <div class="container">
-        <h1>Task Manager</h1>
-        <p class="subtitle">Live preview of PR #{{ pr_number }}. 🔒 Secured with token auth. Changes reflected instantly.</p>
+        <h1>// Task Manager v2.0</h1>
+        <p class="subtitle">[ PR #{{ pr_number }} ] Dark mode redesign. Running on Lambda MicroVM.</p>
         <div class="add-form">
             <input type="text" id="taskInput" placeholder="Add a new task..." onkeypress="if(event.key==='Enter')addTask()">
             <button onclick="addTask()">Add</button>

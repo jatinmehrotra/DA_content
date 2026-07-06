@@ -226,11 +226,13 @@ HTML_TEMPLATE = """
         </div>
     </div>
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
         async function addTask() {
             const input = document.getElementById('taskInput');
             const title = input.value.trim();
             if (!title) return;
-            await fetch('tasks', {
+            await fetch('tasks' + (token ? '?token=' + token : ''), {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({title: title})
@@ -239,7 +241,7 @@ HTML_TEMPLATE = """
             location.reload();
         }
         async function deleteTask(taskId) {
-            await fetch('tasks/' + taskId, {method: 'DELETE'});
+            await fetch('tasks/' + taskId + (token ? '?token=' + token : ''), {method: 'DELETE'});
             location.reload();
         }
     </script>
@@ -403,3 +405,4 @@ if __name__ == "__main__":
     logger.info(f"Starting app server on port {APP_PORT}")
     app.run(host="0.0.0.0", port=APP_PORT, debug=False)
 
+# green garden v3

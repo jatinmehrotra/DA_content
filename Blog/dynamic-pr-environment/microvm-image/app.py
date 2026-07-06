@@ -401,3 +401,4 @@ if __name__ == "__main__":
     # Then start app server (user traffic)
     logger.info(f"Starting app server on port {APP_PORT}")
     app.run(host="0.0.0.0", port=APP_PORT, debug=False)
+

@@ -21,4 +21,3 @@ export function createApp(): Express {
 
   return app;
 }
-const broken: any = 'this will fail lint';

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://schema.agentcore.aws.dev/v1/agentcore.json",
+  "name": "RefundAgent",
+  "version": 1,
+  "managedBy": "CDK",
+  "tags": {
+    "agentcore:created-by": "agentcore-cli",
+    "agentcore:project-name": "RefundAgent"
+  },
+  "runtimes": [
+    {
+      "name": "RefundAgent",
+      "build": "CodeZip",
+      "entrypoint": "main.py",
+      "codeLocation": "app/RefundAgent/",
+      "runtimeVersion": "PYTHON_3_14",
+      "networkMode": "PUBLIC",
+      "protocol": "HTTP"
+    }
+  ],
+  "memories": [],
+  "knowledgeBases": [],
+  "credentials": [],
+  "evaluators": [],
+  "onlineEvalConfigs": [],
+  "agentCoreGateways": [
+    {
+      "name": "RefundGateway",
+      "protocolType": "None",
+      "description": "Gateway for RefundGateway",
+      "targets": [
+        {
+          "name": "RefundTarget",
+          "targetType": "lambdaFunctionArn",
+          "lambdaFunctionArn": {
+            "lambdaArn": "arn:aws:lambda:us-east-1:345063271679:function:refund-processor",
+            "toolSchemaFile": "refund_tools.json"
+          }
+        }
+      ],
+      "authorizerType": "NONE",
+      "enableSemanticSearch": true,
+      "exceptionLevel": "NONE",
+      "policyEngineConfiguration": {
+        "policyEngineName": "RefundPolicyEngine",
+        "mode": "ENFORCE"
+      }
+    }
+  ],
+  "policyEngines": [
+    {
+      "name": "RefundPolicyEngine",
+      "policies": [
+        {
+          "name": "RefundLimit",
+          "statement": "permit (principal, action == AgentCore::Action::\"RefundTarget___process_refund\", resource == AgentCore::Gateway::\"arn:aws:bedrock-agentcore:us-east-1:345063271679:gateway/refundagent-refundgateway-d9jafwgmey\")\nwhen { context.input.amount < 1000 };",
+          "validationMode": "FAIL_ON_ANY_FINDINGS",
+          "enforcementMode": "ACTIVE",
+          "authorizationPhase": "INITIATE"
+        }
+      ]
+    }
+  ],
+  "configBundles": [],
+  "abTests": [],
+  "harnesses": [],
+  "datasets": [],
+  "payments": []
+}

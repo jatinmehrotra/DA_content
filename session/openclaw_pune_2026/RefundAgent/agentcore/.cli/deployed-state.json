@@ -1,0 +1,44 @@
+{
+  "targets": {
+    "default": {
+      "resources": {
+        "runtimes": {
+          "RefundAgent": {
+            "runtimeId": "RefundAgent_RefundAgent-ECrrwgDLWZ",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:345063271679:runtime/RefundAgent_RefundAgent-ECrrwgDLWZ",
+            "roleArn": "arn:aws:iam::345063271679:role/AgentCore-RefundAgent-def-ApplicationAgentRefundAge-r8CZDeemDW7t"
+          }
+        },
+        "mcp": {
+          "gateways": {
+            "RefundGateway": {
+              "gatewayId": "refundagent-refundgateway-d9jafwgmey",
+              "gatewayArn": "arn:aws:bedrock-agentcore:us-east-1:345063271679:gateway/refundagent-refundgateway-d9jafwgmey",
+              "gatewayUrl": "https://refundagent-refundgateway-d9jafwgmey.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+              "targets": {
+                "RefundTarget": {
+                  "targetId": "ESCOYO5TDI"
+                }
+              }
+            }
+          }
+        },
+        "policyEngines": {
+          "RefundPolicyEngine": {
+            "policyEngineId": "RefundAgent_RefundPolicyEngine-75rgf6m3rd",
+            "policyEngineArn": "arn:aws:bedrock-agentcore:us-east-1:345063271679:policy-engine/RefundAgent_RefundPolicyEngine-75rgf6m3rd"
+          }
+        },
+        "policies": {
+          "RefundPolicyEngine/RefundLimit": {
+            "policyId": "RefundLimit-ajcjxkob5x",
+            "policyArn": "arn:aws:bedrock-agentcore:us-east-1:345063271679:policy-engine/RefundAgent_RefundPolicyEngine-75rgf6m3rd/policy/RefundLimit-ajcjxkob5x",
+            "engineName": "RefundPolicyEngine"
+          }
+        },
+        "stackName": "AgentCore-RefundAgent-default",
+        "deployHash": "180d7ffcf88070d2"
+      }
+    }
+  }
+}

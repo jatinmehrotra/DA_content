@@ -1,0 +1,12 @@
+# .NET / Visual Studio
+bin/
+obj/
+*.user
+*.suo
+.vs/
+packages/
+# Build results
+[Dd]ebug/
+[Rr]elease/
+# OS
+.DS_Store

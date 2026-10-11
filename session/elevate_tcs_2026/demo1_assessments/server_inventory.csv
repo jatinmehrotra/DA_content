@@ -1,0 +1,11 @@
+server_name,os,os_version,cpu_cores,memory_gb,storage_gb,environment,app_name,utilization_cpu_pct,utilization_mem_pct
+web-prod-01,Windows Server,2012 R2,4,16,200,Production,CustomerPortal,22,48
+web-prod-02,Windows Server,2012 R2,4,16,200,Production,CustomerPortal,19,51
+app-prod-01,Windows Server,2016,8,32,500,Production,OrdersService,35,62
+app-prod-02,Windows Server,2016,8,32,500,Production,OrdersService,31,58
+db-prod-01,Windows Server,2016,16,64,2000,Production,SQLServer-Orders,44,71
+batch-prod-01,Red Hat Enterprise Linux,7.9,8,32,1000,Production,NightlyBatch,12,40
+web-dev-01,Windows Server,2012 R2,2,8,100,Development,CustomerPortal,8,30
+app-dev-01,Windows Server,2016,4,16,250,Development,OrdersService,10,33
+db-dev-01,Windows Server,2016,8,32,500,Development,SQLServer-Orders,15,45
+cache-prod-01,Red Hat Enterprise Linux,8.4,4,16,120,Production,RedisCache,28,55

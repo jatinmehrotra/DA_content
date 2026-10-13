@@ -1,40 +1,35 @@
-# Pushing the demo repos to GitHub
+# Source code into AWS Transform - what we actually use
 
-Two repos need to be on GitHub so the AWS Transform console/CLI can connect:
-- demo3_atx_java   (the ATX anchor demo)
-- demo4_dotnet     (the .NET modernization demo)
+TL;DR: for this talk, **.NET uses Direct Upload (a zip), not a GitHub connector.**
+Keep this file for reference, but you do NOT need to push repos for the demos.
 
-demo1_assessments (CSV upload) and demo5_mainframe (folder upload) do NOT need a
-repo - you upload them directly in the console.
+## Why not the GitHub connector
+In setup, we created an AWS CodeConnections GitHub connection (`tcs-transform`) and it
+showed **Available** - but AWS Transform still FAILED to validate its ARN
+("Dynamic import failed" / connector ARN failing to validate). Root cause: the IAM
+role AWS Transform uses was missing `codeconnections:UseConnection`
+(formerly `codestar-connections:UseConnection`). That is an account/IAM policy fix,
+not something to debug live. So we switched to Direct Upload.
 
-## Option A - GitHub CLI (fastest, if `gh` is installed)
-Run from each repo folder:
+## What each demo actually uses for source
+- demo1_assessments - upload `server_inventory.csv` directly in the Assessments job
+- demo3_atx_java    - LOCAL repo; atx runs on the folder on disk (no push needed)
+- demo4_dotnet      - **Direct Upload**: drag `demo4_dotnet.zip` into the chat
+- demo5_mainframe   - walkthrough (needs Neptune); zip exists but is not the stage path
 
-    cd demo3_atx_java
-    git init
-    git add .
-    git commit -m "AWS Transform demo - Java 8 app for version-upgrade"
-    gh repo create elevate-tcs-atx-java --private --source=. --push
+## The 4 source-code options AWS Transform offers (for reference)
+1. Code Connection - AWS CodeConnections (GitHub/GitLab/Bitbucket/Azure Repos)
+2. PAT - personal access token stored in AWS Secrets Manager
+3. S3 - a code zip in an S3 bucket
+4. Direct Upload - drag a zip into the chat   <- we use this
 
-    cd ../demo4_dotnet
-    git init
-    git add .
-    git commit -m "AWS Transform demo - .NET Framework 4.7.2 app"
-    gh repo create elevate-tcs-dotnet --private --source=. --push
+## If you ever want the GitHub connector to work (post-event)
+Grant the AWS Transform execution role `codeconnections:UseConnection` on the
+connection ARN, in the same Region as the job (us-east-1). The connection ARN from
+setup was:
+  arn:aws:codeconnections:us-east-1:345063271679:connection/7b75ceef-ca05-4561-bf2f-7d9e5bbf5d4a
 
-## Option B - plain git (create the empty repo on github.com first)
-    cd demo3_atx_java
-    git init
-    git add .
-    git commit -m "AWS Transform demo - Java 8 app for version-upgrade"
-    git branch -M main
-    git remote add origin https://github.com/<you>/elevate-tcs-atx-java.git
-    git push -u origin main
-
-    # repeat for demo4_dotnet with its own remote URL
-
-## Notes
-- Private repos are fine - connect them via your GitHub account in the console.
-- Each repo has a .gitignore so build output (target/, bin/, obj/) stays out.
-- Secret scan run on 2026-10-12: both repos clean (the 12-digit match in
-  OrderApp.sln is just a Visual Studio project GUID, not an AWS account ID).
+## Making the demo zips (already created)
+demo4_dotnet.zip and demo5_mainframe.zip are already in this folder. To regenerate,
+zip the folder contents with a top-level folder inside the archive and exclude build
+output (bin/, obj/, .vs/, target/, .git/).
